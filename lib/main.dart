@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:esop/dto/Info.dart';
+import 'package:esop/utils/util.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,10 +31,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
+  final FocusNode _focusNode = FocusNode();
+
   final TextEditingController _controller =
       TextEditingController(); // TextEditingController
   Set<Info> infos = {};
   late RawDatagramSocket socket;
+  late TabController _tabController;
 
   @override
   void initState() {
@@ -41,13 +47,15 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     var infolist = infos.toList();
     var button = ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
         Wrap(
-          spacing: 8.0, // 主轴方向间距
-          runSpacing: 8.0, // 换行间距
+          spacing: 10.0, // 主轴方向间距
+          runSpacing: 5, // 换行间距
           children: List.generate(
             infolist.length,
             (index) => Container(
@@ -55,7 +63,9 @@ class HomeScreenState extends State<HomeScreen> {
               height: 50,
               alignment: Alignment.center,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  clickDeviceDialog(context, infolist[index]);
+                },
                 child: SizedBox(
                   width: 100,
                   child: Text(infolist[index]
@@ -68,13 +78,14 @@ class HomeScreenState extends State<HomeScreen> {
         ),
       ],
     );
-    var text = TextField(
+    var search = TextField(
       controller: _controller,
+      focusNode: _focusNode,
       decoration: InputDecoration(
         hintText: '搜索',
         hintStyle: const TextStyle(
           color: Colors.black,
-          fontWeight: FontWeight.w100, // 设置加粗
+          fontWeight: FontWeight.w100,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
@@ -87,32 +98,43 @@ class HomeScreenState extends State<HomeScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('App'),
-        actions: [
-          // 输入框
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: SizedBox(
-              width: 150,
-              child: text,
+        appBar: AppBar(
+          title: const Text('App'),
+          actions: [
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  infos.clear();
+                });
+              },
+              icon: const Icon(Icons.refresh),
+            )
+          ],
+        ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: screenWidth * 0.6, // 设置最大宽度
+                  ),
+                  child: search,
+                ),
+                IconButton(
+                  onPressed: () {
+                    _controller.clear();
+                    _focusNode.unfocus();
+                    setState(() {});
+                  },
+                  icon: const Icon(Icons.close),
+                )
+              ],
             ),
-          ),
-          IconButton(
-            onPressed: () {
-              _controller.clear();
-              infos.clear();
-            },
-            icon: const Icon(Icons.close),
-          )
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(child: button), // 使用 Expanded 保证 ListView 不会超出屏幕
-        ],
-      ),
-    );
+            Expanded(child: button),
+          ],
+        ));
   }
 
   void startUDPListener() async {
@@ -127,22 +149,76 @@ class HomeScreenState extends State<HomeScreen> {
             var decode = utf8.decode(datagram.data);
             if (decode.startsWith("{")) {
               var info = Info.fromJson(json.decode(decode));
+              var source = "${datagram.address.address}:${datagram.port}";
+              info.source = source;
               setState(() {
                 infos.add(info);
               });
-              print(infos.toString());
             }
           }
         }
       });
+      sendPing(socket);
+      Timer.periodic(const Duration(seconds: 5), (timer) {
+        sendPing(socket);
+      });
     });
   }
 
-  void sendPing() {
-    send("ping", "172.16.60.255", 2369, socket);
-  }
+  void clickDeviceDialog(BuildContext context, Info info) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final screenHeight = MediaQuery.of(context).size.height;
+        ElevatedButton buildButton(String buttonText, String cmd) {
+          return ElevatedButton(
+            onPressed: () async {
+              sendControllerWithLoadingInDialog(context, info, cmd);
+            },
+            child: Text(buttonText),
+          );
+        }
 
-  void send(String msg, String add, int port, RawDatagramSocket socket) {
-    socket.send(utf8.encode(msg), InternetAddress(add), 2369);
+        return Dialog(
+          child: Container(
+              constraints: BoxConstraints(
+                maxWidth: screenWidth * 0.8,
+                maxHeight: screenHeight * 0.8,
+              ),
+              padding: const EdgeInsets.all(20),
+              child: ListView(
+                children: [
+                  const Align(
+                    child: Text(
+                      "设备信息",
+                      style:
+                          TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Text("设备名称:${info.name}"),
+                  Text("网页地址:${info.web}"),
+                  Text("视频地址:${info.video}"),
+                  Text("目标服务器:${info.ip}"),
+                  Text("uuid:${info.uuid}"),
+                  Text("设备:${info.device}"),
+                  Text("来源:${info.source}"),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Wrap(
+                      spacing: 10.0, // 主轴方向间距
+                      runSpacing: 5, // 换行间距
+                      children: [
+                        buildButton("打开web", "web"),
+                        buildButton("打开视频", "video"),
+                        buildButton("显示配置", "code"),
+                      ]),
+
+                ],
+              )),
+        );
+      },
+    );
   }
 }
