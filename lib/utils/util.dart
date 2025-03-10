@@ -7,28 +7,32 @@ import 'package:esop/dto/Info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
+import '../AppProvider.dart';
+
 const salt = "dficn397dzlaaqwnzx884466288";
 
-showToastInDialog(BuildContext context, String msg) {
+showToastInDialog(BuildContext context, String msg,
+    {Color color = Colors.black87}) {
   showToast(
     msg,
     context: context,
     backgroundColor: Colors.white,
-    textStyle: const TextStyle(color: Colors.black87),
-    position: const StyledToastPosition(align: Alignment.topCenter,
-      offset: 20
-    ),
+    textStyle: TextStyle(color: color),
+    position: const StyledToastPosition(align: Alignment.topCenter, offset: 20),
     animation: StyledToastAnimation.scale,
   );
 }
 
-showLoadingInDialog(BuildContext context) {
+void showLoadingInDialog(BuildContext context) {
   showDialog(
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) {
-      return const Center(
-        child: CircularProgressIndicator(),
+      return const PopScope(
+        canPop: false, // 禁止返回键
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
       );
     },
   );
@@ -40,47 +44,85 @@ String computeSHA256(String input) {
   return digest.toString(); // 返回哈希值的字符串表示
 }
 
-Future<bool> sendController(Info info, String cmd) async {
+Future<bool> sendController(Info info, String cmd, {int timeout = 3}) async {
   final Completer<bool> completer = Completer();
-  var SHA256 = computeSHA256(cmd + salt);
-  String at = SHA256 + cmd;
-  RawDatagramSocket.bind(InternetAddress.anyIPv4, 12369)
-      .then((RawDatagramSocket socket) {
-    socket.broadcastEnabled = true;
-    socket.listen((RawSocketEvent event) {
-      if (event == RawSocketEvent.read) {
-        Datagram? datagram = socket.receive();
-        if (datagram != null) {
-          String decode = utf8.decode(datagram.data);
-          if (decode == SHA256) {
-            socket.close();
-            completer.complete(true); // 完成 completer 并返回结果
-          }
+  var socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 0);
+  socket.broadcastEnabled = true;
+  var timer = Timer(Duration(seconds: timeout), () {
+    socket.close();
+    completer.complete(false);
+  });
+  socket.listen((RawSocketEvent event) {
+    if (event == RawSocketEvent.read) {
+      Datagram? datagram = socket.receive();
+      if (datagram != null) {
+        String decode = utf8.decode(datagram.data);
+        print(decode);
+        if (decode == cmd) {
+          print("success");
+          timer.cancel();
+          socket.close();
+          completer.complete(true);
         }
       }
-    });
-    send(at, info.source.split(":")[0],
-        int.tryParse(info.source.split(":")[1]) as int, socket);
+    }
+  }).onError((e, a) {
+    if (e is SocketException) {
+      print(e);
+      timer.cancel();
+      socket.close();
+      completer.complete(false);
+    }
   });
-  return completer.future; // 返回 Future
+  socket.send(utf8.encode(cmd), InternetAddress(info.source.split(":")[0]),
+      int.tryParse(info.source.split(":")[1]) as int);
+  return completer.future;
 }
 
-sendControllerWithLoadingInDialog(
+Future<bool> sendControllerWithLoadingInDialog(
     BuildContext context, Info info, String cmd) async {
   showLoadingInDialog(context);
   var ok = await sendController(info, cmd);
-  if (ok && context.mounted) {
-    Navigator.of(context).pop();
-    showToastInDialog(context, " 设备接收成功 ");
+  if (context.mounted) {
+    if (ok) {
+      Navigator.of(context).pop();
+      showToastInDialog(context, " 设备接收成功 ");
+    } else {
+      Navigator.of(context).pop();
+      showToastInDialog(context, " 发送失败 ", color: Colors.deepOrange);
+    }
   }
+  return ok;
 }
 
-
-
-void sendPing(RawDatagramSocket socket) {
-  send("ping", "172.16.60.255", 2369, socket);
+int sendPing(RawDatagramSocket socket, String ip) {
+  return send("ping", ip, 2369, socket);
 }
 
-void send(String msg, String add, int port, RawDatagramSocket socket) {
-  socket.send(utf8.encode(msg), InternetAddress(add), port);
+void sendPingList(RawDatagramSocket socket, List<String> ip, AppData app,
+    {required int port}) async {
+  var dateTime = DateTime.now().millisecondsSinceEpoch;
+  for (var o in ip) {
+    print("scan  $o");
+    app.addlogo("scan  $o");
+    for (int i = 1; i <= 255; i++) {
+      // await Future.delayed(const Duration(milliseconds: 300));
+      var ip = "${o.split(".").sublist(0, 3).join(".")}.$i";
+      var socket1 = await RawDatagramSocket.bind(InternetAddress.anyIPv4, port);
+      socket1.broadcastEnabled = true;
+      // print(ip);
+      // app.addlogo("扫描  $ip");
+
+      sendPing(socket1, ip);
+      socket1.close();
+    }
+  }
+  var i = DateTime.now().millisecondsSinceEpoch - dateTime;
+  app.addlogo("扫描耗时 $i 毫秒");
+
+  print("扫描耗时 $i 毫秒");
+}
+
+int send(String msg, String add, int port, RawDatagramSocket socket) {
+  return socket.send(utf8.encode(msg), InternetAddress(add), port);
 }

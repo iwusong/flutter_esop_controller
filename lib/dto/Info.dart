@@ -1,26 +1,27 @@
 class Info {
-  final String web;
-  final String video;
-  final String uuid;
-  final String ip;
-  final String name;
+  String web;
+  String video;
+  String uuid;
+  String ip;
+  String name;
   String source;
-  final String device;
+  String device;
+  String code;
 
   Info(this.web, this.video, this.uuid, this.ip, this.name, this.source,
-      this.device);
+      this.device, this.code);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Info && runtimeType == other.runtimeType && uuid == other.uuid;
+          other is Info && runtimeType == other.runtimeType && uuid == other.uuid;
 
   @override
   int get hashCode => uuid.hashCode;
 
   @override
   String toString() {
-    return 'Info{web: $web, video: $video, uuid: $uuid, ip: $ip, name: $name, source: $source, device: $device}';
+    return 'Info(web: $web, video: $video, uuid: $uuid, ip: $ip, name: $name, source: $source, device: $device, code: $code)';
   }
 
   Info.fromJson(Map<String, dynamic> json)
@@ -30,5 +31,61 @@ class Info {
         ip = json['ip'] ?? "",
         source = json['source'] ?? "",
         name = json['name'] ?? "",
+        code = json['code'] ?? "",
         device = json['device'] ?? "";
+
+  dynamic operator [](String key) {
+    switch (key) {
+      case 'web':
+        return web;
+      case 'video':
+        return video;
+      case 'uuid':
+        return uuid;
+      case 'ip':
+        return ip;
+      case 'name':
+        return name;
+      case 'source':
+        return source;
+      case 'device':
+        return device;
+      case 'code':
+        return code;
+      default:
+        throw ArgumentError('Invalid key: $key');
+    }
+  }
+
+  // 通过 []= 设置属性值
+  void operator []=(String key, dynamic value) {
+    switch (key) {
+      case 'web':
+        web = value;
+        break;
+      case 'video':
+        video = value;
+        break;
+      case 'uuid':
+        uuid = value;
+        break;
+      case 'ip':
+        ip = value;
+        break;
+      case 'name':
+        name = value;
+        break;
+      case 'source':
+        source = value;
+        break;
+      case 'device':
+        device = value;
+        break;
+      case 'code':
+        code = value;  // 修正这里
+        break;
+      default:
+        throw ArgumentError('Invalid key: $key');
+    }
+  }
 }

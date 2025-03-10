@@ -3,12 +3,22 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:esop/dto/Info.dart';
+import 'package:esop/utils/clickDeviceDialog.dart';
 import 'package:esop/utils/util.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:prompt_dialog/prompt_dialog.dart';
+import 'package:provider/provider.dart';
+
+import 'AppProvider.dart';
+import 'config/config.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AppData(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -37,19 +47,40 @@ class HomeScreenState extends State<HomeScreen> {
       TextEditingController(); // TextEditingController
   Set<Info> infos = {};
   late RawDatagramSocket socket;
-  late TabController _tabController;
+  String st = "";
+  late Future<void> _loadDataFuture;
+  bool _isSwitched = false;
 
   @override
   void initState() {
     super.initState();
+    _loadDataFuture = Provider.of<AppData>(context, listen: false)
+        .loadDataFromSharedPreferences();
     startUDPListener();
   }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _loadDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          return buildContent(context);
+        }
+      },
+    );
+  }
+
+  Widget buildContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    var infolist = infos.toList();
+    var infolist = st.isEmpty
+        ? (infos.toList()..sort((a, b) => a.source.compareTo(b.source)))
+        : infos.where((info) => info.uuid.contains(st)).toList()
+      ..sort((a, b) => a.source.compareTo(b.source));
+
     var button = ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
@@ -58,21 +89,13 @@ class HomeScreenState extends State<HomeScreen> {
           runSpacing: 5, // 换行间距
           children: List.generate(
             infolist.length,
-            (index) => Container(
-              width: 100, // 控制容器宽度
-              height: 50,
-              alignment: Alignment.center,
-              child: ElevatedButton(
-                onPressed: () {
-                  clickDeviceDialog(context, infolist[index]);
-                },
-                child: SizedBox(
-                  width: 100,
-                  child: Text(infolist[index]
-                      .uuid
-                      .substring(infolist[index].uuid.length - 6)),
-                ),
-              ),
+            (index) => ElevatedButton(
+              onPressed: () {
+                clickDeviceDialog(context, infolist[index]);
+              },
+              child: st == ""
+                  ? Text(_isSwitched?infolist[index].name:infolist[index].source)
+                  : Text(infolist[index].uuid.substring(0, 13)),
             ),
           ),
         ),
@@ -82,7 +105,7 @@ class HomeScreenState extends State<HomeScreen> {
       controller: _controller,
       focusNode: _focusNode,
       decoration: InputDecoration(
-        hintText: '搜索',
+        hintText: 'uuid',
         hintStyle: const TextStyle(
           color: Colors.black,
           fontWeight: FontWeight.w100,
@@ -93,7 +116,9 @@ class HomeScreenState extends State<HomeScreen> {
         ),
       ),
       onChanged: (text) {
-        print(text);
+        setState(() {
+          st = text;
+        });
       },
     );
 
@@ -103,12 +128,51 @@ class HomeScreenState extends State<HomeScreen> {
           actions: [
             IconButton(
               onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text("控制台输出"),
+                      content: SizedBox(
+                        width: screenWidth * 0.9,
+                        height: screenHeight * 0.9,
+                        child: SingleChildScrollView(
+                          child: Consumer<AppData>(
+                            builder: (context, appData, child) {
+                              return Column(
+                                children: appData.logolist
+                                    .map((e) => Text(e))
+                                    .toList(),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+              icon: const Icon(Icons.computer),
+            ),
+            IconButton(
+              onPressed: () {
                 setState(() {
                   infos.clear();
                 });
               },
               icon: const Icon(Icons.refresh),
-            )
+            ),
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return const NewRoute();
+                  }),
+                );
+              },
+            ),
           ],
         ),
         body: Column(
@@ -118,7 +182,7 @@ class HomeScreenState extends State<HomeScreen> {
               children: [
                 Container(
                   constraints: BoxConstraints(
-                    maxWidth: screenWidth * 0.6, // 设置最大宽度
+                    maxWidth: screenWidth * 0.5, // 设置最大宽度
                   ),
                   child: search,
                 ),
@@ -126,10 +190,34 @@ class HomeScreenState extends State<HomeScreen> {
                   onPressed: () {
                     _controller.clear();
                     _focusNode.unfocus();
-                    setState(() {});
+                    setState(() {
+                      st = "";
+                    });
                   },
                   icon: const Icon(Icons.close),
-                )
+                ),
+                Container(
+                    constraints: BoxConstraints(
+                      maxWidth: screenWidth * 0.3, // 设置最大宽度
+                    ),
+                    child:  Row(
+                      children: [
+                        Transform.scale(
+                          scale: 0.7,
+                          child: Switch(
+                            value: _isSwitched,
+                            onChanged: (value) {
+                              setState(() {
+                                _isSwitched = value;
+                              });
+                            },
+                            activeTrackColor: Colors.lightGreenAccent,
+                            activeColor: Colors.green,
+                          ),
+                        ),
+                        Text( _isSwitched?"名称":"ip地址"),
+                      ],
+                    )),
               ],
             ),
             Expanded(child: button),
@@ -138,87 +226,43 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void startUDPListener() async {
-    RawDatagramSocket.bind(InternetAddress.anyIPv4, 32367)
-        .then((RawDatagramSocket socket) {
-      this.socket = socket;
-      socket.broadcastEnabled = true;
-      socket.listen((RawSocketEvent event) {
-        if (event == RawSocketEvent.read) {
-          Datagram? datagram = socket.receive();
-          if (datagram != null) {
-            var decode = utf8.decode(datagram.data);
-            if (decode.startsWith("{")) {
-              var info = Info.fromJson(json.decode(decode));
-              var source = "${datagram.address.address}:${datagram.port}";
-              info.source = source;
-              setState(() {
-                infos.add(info);
-              });
-            }
+    var app = context.read<AppData>(); // 使用 context.read() 获取 app 的值
+
+    socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 0);
+    socket.broadcastEnabled = true;
+    var listen = socket.listen((RawSocketEvent event) {
+      if (event == RawSocketEvent.read) {
+        Datagram? datagram = socket.receive();
+        if (datagram != null) {
+          var decode = utf8.decode(datagram.data);
+          print(decode);
+          app.addlogo(decode);
+          if (decode.startsWith("{")) {
+            var info = Info.fromJson(json.decode(decode));
+            var source = "${datagram.address.address}:${datagram.port}";
+            info.source = source;
+            setState(() {
+              infos.add(info);
+            });
           }
         }
-      });
-      sendPing(socket);
+      }
+    });
+    listen.onError((e, a) {
+      if (e is SocketException) {
+        print("listen.onError");
+        print(e);
+        print(a);
+        app.addlogo(e.toString());
+        app.addlogo(a.toString());
+      }
+    });
+
+    Future.delayed(const Duration(seconds: 1), () {
+      sendPingList(socket, app.ipList, app, port: socket.port);
       Timer.periodic(const Duration(seconds: 5), (timer) {
-        sendPing(socket);
+        sendPingList(socket, app.ipList, app, port: socket.port);
       });
     });
-  }
-
-  void clickDeviceDialog(BuildContext context, Info info) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        final screenWidth = MediaQuery.of(context).size.width;
-        final screenHeight = MediaQuery.of(context).size.height;
-        ElevatedButton buildButton(String buttonText, String cmd) {
-          return ElevatedButton(
-            onPressed: () async {
-              sendControllerWithLoadingInDialog(context, info, cmd);
-            },
-            child: Text(buttonText),
-          );
-        }
-
-        return Dialog(
-          child: Container(
-              constraints: BoxConstraints(
-                maxWidth: screenWidth * 0.8,
-                maxHeight: screenHeight * 0.8,
-              ),
-              padding: const EdgeInsets.all(20),
-              child: ListView(
-                children: [
-                  const Align(
-                    child: Text(
-                      "设备信息",
-                      style:
-                          TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Text("设备名称:${info.name}"),
-                  Text("网页地址:${info.web}"),
-                  Text("视频地址:${info.video}"),
-                  Text("目标服务器:${info.ip}"),
-                  Text("uuid:${info.uuid}"),
-                  Text("设备:${info.device}"),
-                  Text("来源:${info.source}"),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Wrap(
-                      spacing: 10.0, // 主轴方向间距
-                      runSpacing: 5, // 换行间距
-                      children: [
-                        buildButton("打开web", "web"),
-                        buildButton("打开视频", "video"),
-                        buildButton("显示配置", "code"),
-                      ]),
-
-                ],
-              )),
-        );
-      },
-    );
   }
 }
