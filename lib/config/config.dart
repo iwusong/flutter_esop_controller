@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import '../AppProvider.dart';
+import '../utils/util.dart';
 
 class NewRoute extends StatelessWidget {
   const NewRoute({super.key});
@@ -67,7 +69,35 @@ class NewRoute extends StatelessWidget {
     String input = "";
     return Scaffold(
         appBar: AppBar(
-          title: const Text('设置'),
+          title: GestureDetector(
+            onDoubleTap: () {
+              // 点击后触发的逻辑（如跳转页面）
+              showLoadingInDialog(context);
+              http
+                  .get(Uri.parse('http://172.16.90.15/ip.txt'))
+                  .then((response) {
+                    response.body.split("\n").forEach((element) {
+                      if (element.isNotEmpty) {
+                        var appData =
+                            Provider.of<AppData>(context, listen: false);
+                        if (!RegExp(
+                          r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
+                        ).hasMatch(input)) {
+                          if (!appData.ipList.contains(element)) {
+                            appData.add(element);
+                          }
+                        }
+                      }
+                    });
+                    showToastInDialog(context, " 服务器获取ip ");
+                  })
+                  .catchError((error) {})
+                  .whenComplete(() {
+                    Navigator.of(context).pop();
+                  });
+            },
+            child: const Text('设置'),
+          ),
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,7 +161,7 @@ class NewRoute extends StatelessWidget {
                         builder: (BuildContext context) {
                           return const AlertDialog(
                             title: Text('提示'),
-                            content: Text(' 输入扫描地址后田间，同网段只需输入一次'),
+                            content: Text(' 输入扫描地址后添加，同网段只需输入一次'),
                           );
                         },
                       );
