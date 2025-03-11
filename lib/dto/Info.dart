@@ -14,7 +14,7 @@ class Info {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Info && runtimeType == other.runtimeType && uuid == other.uuid;
+      other is Info && runtimeType == other.runtimeType && uuid == other.uuid;
 
   @override
   int get hashCode => uuid.hashCode;
@@ -82,7 +82,7 @@ class Info {
         device = value;
         break;
       case 'code':
-        code = value;  // 修正这里
+        code = value; // 修正这里
         break;
       default:
         throw ArgumentError('Invalid key: $key');

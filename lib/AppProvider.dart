@@ -59,6 +59,7 @@ class AppData with ChangeNotifier {
   }
 
   List<String> logolist = [];
+
   void addlogo(String value) {
     logolist.add(value);
     if (logolist.length > 100) {

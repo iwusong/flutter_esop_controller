@@ -36,7 +36,7 @@ class NewRoute extends StatelessWidget {
     var item = Selector<AppData, List<String>>(
       selector: (context, provider) => provider.ipList,
       builder: (context, value, child) {
-        var appData = Provider.of<AppData>(context  );
+        var appData = Provider.of<AppData>(context);
         return ListView.builder(
           itemCount: appData.ipList.length,
           itemBuilder: (context, index) {
@@ -92,7 +92,7 @@ class NewRoute extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () {
-                    var appData = Provider.of<AppData>(context,listen: false);
+                    var appData = Provider.of<AppData>(context, listen: false);
                     if (input.isNotEmpty) {
                       if (!RegExp(
                         r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',

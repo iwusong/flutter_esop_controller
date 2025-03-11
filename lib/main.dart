@@ -6,7 +6,6 @@ import 'package:esop/dto/Info.dart';
 import 'package:esop/utils/clickDeviceDialog.dart';
 import 'package:esop/utils/util.dart';
 import 'package:flutter/material.dart';
-import 'package:prompt_dialog/prompt_dialog.dart';
 import 'package:provider/provider.dart';
 
 import 'AppProvider.dart';
@@ -94,7 +93,9 @@ class HomeScreenState extends State<HomeScreen> {
                 clickDeviceDialog(context, infolist[index]);
               },
               child: st == ""
-                  ? Text(_isSwitched?infolist[index].name:infolist[index].source)
+                  ? Text(_isSwitched
+                      ? infolist[index].name
+                      : infolist[index].source)
                   : Text(infolist[index].uuid.substring(0, 13)),
             ),
           ),
@@ -200,7 +201,7 @@ class HomeScreenState extends State<HomeScreen> {
                     constraints: BoxConstraints(
                       maxWidth: screenWidth * 0.3, // 设置最大宽度
                     ),
-                    child:  Row(
+                    child: Row(
                       children: [
                         Transform.scale(
                           scale: 0.7,
@@ -215,7 +216,7 @@ class HomeScreenState extends State<HomeScreen> {
                             activeColor: Colors.green,
                           ),
                         ),
-                        Text( _isSwitched?"名称":"ip地址"),
+                        Text(_isSwitched ? "名称" : "ip地址"),
                       ],
                     )),
               ],

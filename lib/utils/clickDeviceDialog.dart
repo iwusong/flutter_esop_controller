@@ -1,5 +1,4 @@
 import 'package:esop/utils/util.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:prompt_dialog/prompt_dialog.dart';
 
@@ -37,7 +36,7 @@ void clickDeviceDialog(BuildContext context, Info info) {
               if (bool) {
                 setState(() {
                   clickInfo[key] = s;
-                  print(key) ;
+                  print(key);
                   print(clickInfo);
                 });
               }
@@ -100,8 +99,6 @@ void clickDeviceDialog(BuildContext context, Info info) {
                           buildButton("开绿", "rgb!01 05 00 02 ff 00 2D FA"),
                           buildButton("蜂鸣", "rgb!01 05 00 03 f0 00 79 CA"),
                           buildButton("红闪", "rgb!01 05 00 00 f0 00 89 CA"),
-
-
                         ]),
                   ],
                 )),
