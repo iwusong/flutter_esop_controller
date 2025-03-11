@@ -42,6 +42,7 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen> {
   final FocusNode _focusNode = FocusNode();
 
+  final ScrollController _scrollController = ScrollController();
   final TextEditingController _controller =
       TextEditingController(); // TextEditingController
   Set<Info> infos = {};
@@ -138,8 +139,16 @@ class HomeScreenState extends State<HomeScreen> {
                         width: screenWidth * 0.9,
                         height: screenHeight * 0.9,
                         child: SingleChildScrollView(
+                          controller: _scrollController,
                           child: Consumer<AppData>(
                             builder: (context, appData, child) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (_scrollController.hasClients) {
+                                  _scrollController.jumpTo(
+                                    _scrollController.position.maxScrollExtent,
+                                  );
+                                }
+                              });
                               return Column(
                                 children: appData.logolist
                                     .map((e) => Text(e))
@@ -265,5 +274,11 @@ class HomeScreenState extends State<HomeScreen> {
         sendPingList(socket, app.ipList, app, port: socket.port);
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose(); // 释放控制器
+    super.dispose();
   }
 }
