@@ -49,7 +49,7 @@ class HomeScreenState extends State<HomeScreen> {
   late RawDatagramSocket socket;
   String st = "";
   late Future<void> _loadDataFuture;
-  bool _isSwitched = false;
+  bool _isSwitched = true;
 
   @override
   void initState() {
@@ -76,10 +76,13 @@ class HomeScreenState extends State<HomeScreen> {
   Widget buildContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
+
+
     var infolist = st.isEmpty
-        ? (infos.toList()..sort((a, b) => a.source.compareTo(b.source)))
+        ? (infos.toList()..sort((a, b) => a.name.compareTo(b.name)))
         : infos.where((info) => info.uuid.contains(st)).toList()
-      ..sort((a, b) => a.source.compareTo(b.source));
+      ..sort((a, b) => a.name.compareTo(b.name));
 
     var button = ListView(
       padding: const EdgeInsets.all(16.0),
@@ -260,18 +263,24 @@ class HomeScreenState extends State<HomeScreen> {
     });
     listen.onError((e, a) {
       if (e is SocketException) {
-        print("listen.onError");
-        print(e);
-        print(a);
+        app.addlogo("listen.onError");
         app.addlogo(e.toString());
         app.addlogo(a.toString());
       }
     });
 
     Future.delayed(const Duration(seconds: 1), () {
-      sendPingList(socket, app.ipList, app, port: socket.port);
+      sendPingList(
+        socket,
+        app.ipList.toList(),
+        app,
+      );
       Timer.periodic(const Duration(seconds: 5), (timer) {
-        sendPingList(socket, app.ipList, app, port: socket.port);
+        sendPingList(
+          socket,
+          app.ipList.toList(),
+          app,
+        );
       });
     });
   }
