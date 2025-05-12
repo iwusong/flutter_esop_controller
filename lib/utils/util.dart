@@ -99,28 +99,18 @@ int sendPing(RawDatagramSocket socket, String ip) {
   return send("ping", ip, 2369, socket);
 }
 
-void sendPingList(RawDatagramSocket socket, List<String> ip, AppData app,
-    {required int port}) async {
+void sendPingList(
+    RawDatagramSocket socket, List<String> ip, AppData app) async {
   var dateTime = DateTime.now().millisecondsSinceEpoch;
   for (var o in ip) {
-    print("scan  $o");
     app.addlogo("scan  $o");
     for (int i = 1; i <= 255; i++) {
-      // await Future.delayed(const Duration(milliseconds: 300));
       var ip = "${o.split(".").sublist(0, 3).join(".")}.$i";
-      var socket1 = await RawDatagramSocket.bind(InternetAddress.anyIPv4, port);
-      socket1.broadcastEnabled = true;
-      // print(ip);
-      // app.addlogo("扫描  $ip");
-
-      sendPing(socket1, ip);
-      socket1.close();
+      sendPing(socket, ip);
     }
   }
   var i = DateTime.now().millisecondsSinceEpoch - dateTime;
   app.addlogo("扫描耗时 $i 毫秒");
-
-  print("扫描耗时 $i 毫秒");
 }
 
 int send(String msg, String add, int port, RawDatagramSocket socket) {
