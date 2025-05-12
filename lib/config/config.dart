@@ -10,37 +10,13 @@ class NewRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //     ListView.builder(
-    //   itemCount: appData.ipList.length,
-    //   itemBuilder: (context, index) {
-    //     return Padding(
-    //       padding: const EdgeInsets.only(left: 20, right: 10),
-    //       child: Row(
-    //         mainAxisAlignment: MainAxisAlignment.start,
-    //         children: [
-    //           Expanded(
-    //               child: Text(
-    //             "${appData.ipList[index] } ",
-    //             style: const TextStyle(fontSize: 22),
-    //           )),
-    //           IconButton(
-    //             icon: const Icon(Icons.delete),
-    //             onPressed: () {
-    //               appData.removeAt(index);
-    //             },
-    //           ),
-    //         ],
-    //       ),
-    //     );
-    //   },
-    // );
-
-    var item = Selector<AppData, List<String>>(
+    var item = Selector<AppData, Set<String>>(
       selector: (context, provider) => provider.ipList,
       builder: (context, value, child) {
         var appData = Provider.of<AppData>(context);
+        var list = appData.ipList.toList();
         return ListView.builder(
-          itemCount: appData.ipList.length,
+          itemCount: list.length,
           itemBuilder: (context, index) {
             return Padding(
               padding: const EdgeInsets.only(left: 20, right: 10),
@@ -49,13 +25,13 @@ class NewRoute extends StatelessWidget {
                 children: [
                   Expanded(
                       child: Text(
-                    "${appData.ipList[index]} ",
+                    "${list[index]} ",
                     style: const TextStyle(fontSize: 22),
                   )),
                   IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () {
-                      appData.removeAt(index);
+                      appData.removeOne(list[index]);
                     },
                   ),
                 ],
@@ -67,6 +43,7 @@ class NewRoute extends StatelessWidget {
     );
     TextEditingController controller = TextEditingController();
     String input = "";
+
     return Scaffold(
         appBar: AppBar(
           title: GestureDetector(
