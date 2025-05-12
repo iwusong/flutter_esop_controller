@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dto/Info.dart';
@@ -25,21 +25,22 @@ class AppData with ChangeNotifier {
     notifyListeners();
   }
 
-  List<String> _ipList = [];
+  Set<String> _ipList = {};
 
-  List<String> get ipList => _ipList;
+  Set<String> get ipList => _ipList;
 
   Future<void> loadDataFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _ipList = prefs.getStringList('scan') ?? []; // 使用一个默认值
+    _ipList = (prefs.getStringList('scan') ?? []).toSet(); // 使用一个默认值
     notifyListeners(); // 通知监听者更新
   }
 
-  Future<void> saveDataIpList(List<String> value) async {
+  Future<void> saveDataIpList(Set<String> value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    value.sort();
-    await prefs.setStringList('scan', value);
-    _ipList = value;
+    var list = value.toList();
+    list.sort();
+    await prefs.setStringList('scan', list);
+    _ipList = value.toSet();
     notifyListeners(); // 通知监听者更新
   }
 
@@ -48,8 +49,8 @@ class AppData with ChangeNotifier {
     saveDataIpList(_ipList); // 保存更新后的列表
   }
 
-  void removeAt(int index) {
-    _ipList.removeAt(index);
+  void removeOne(String ip) {
+    _ipList.remove(ip);
     saveDataIpList(_ipList); // 保存更新后的列表
   }
 
@@ -61,6 +62,9 @@ class AppData with ChangeNotifier {
   List<String> logolist = [];
 
   void addlogo(String value) {
+    if (kDebugMode) {
+      print(value);
+    }
     logolist.add(value);
     if (logolist.length > 100) {
       logolist.removeAt(0);
