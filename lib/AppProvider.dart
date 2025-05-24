@@ -1,40 +1,22 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'dto/Info.dart';
 
 class AppData with ChangeNotifier {
-  Set<Info> infos = {};
 
-  void addInfo(Info info) {
-    infos.add(info);
-    notifyListeners();
-  }
-
-  void clearInfo() {
-    infos.clear();
-    notifyListeners();
-  }
-
-  bool scanIng = false;
-
-  bool get isScanning => scanIng;
-
-  void changeScanIng(bool value) {
-    scanIng = value;
-    notifyListeners();
-  }
 
   Set<String> _ipList = {};
 
   Set<String> get ipList => _ipList;
 
+  // 获取存储的配置
   Future<void> loadDataFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _ipList = (prefs.getStringList('scan') ?? []).toSet(); // 使用一个默认值
     notifyListeners(); // 通知监听者更新
   }
 
+  // 保存ip列表
   Future<void> saveDataIpList(Set<String> value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var list = value.toList();

@@ -77,12 +77,16 @@ class HomeScreenState extends State<HomeScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+    List<Info> infolist;
 
-
-    var infolist = st.isEmpty
-        ? (infos.toList()..sort((a, b) => a.name.compareTo(b.name)))
-        : infos.where((info) => info.uuid.contains(st)).toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+    if (st.isNotEmpty) {
+      infolist = infos.where((info) => info.uuid.contains(st)).toList()
+        ..sort((a, b) => a.uuid.compareTo(b.uuid));
+    } else if (_isSwitched) {
+      infolist = infos.toList()..sort((a, b) => a.name.compareTo(b.name));
+    } else {
+      infolist = infos.toList()..sort((a, b) => a.source.compareTo(b.source));
+    }
 
     var button = ListView(
       padding: const EdgeInsets.all(16.0),
@@ -98,7 +102,8 @@ class HomeScreenState extends State<HomeScreen> {
               },
               child: st == ""
                   ? Text(_isSwitched
-                      ? infolist[index].name
+                      ? infolist[index].name +
+                          extractCodeFromUrl(infolist[index].web)
                       : infolist[index].source)
                   : Text(infolist[index].uuid.substring(0, 13)),
             ),
@@ -176,6 +181,10 @@ class HomeScreenState extends State<HomeScreen> {
               icon: const Icon(Icons.refresh),
             ),
             IconButton(
+              icon: const Icon(Icons.select_all),
+              onPressed: () {},
+            ),
+            IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () {
                 Navigator.push(
@@ -228,7 +237,7 @@ class HomeScreenState extends State<HomeScreen> {
                             activeColor: Colors.green,
                           ),
                         ),
-                        Text(_isSwitched ? "名称" : "ip地址"),
+                        Text(_isSwitched ? "设备名" : "ip地址"),
                       ],
                     )),
               ],

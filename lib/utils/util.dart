@@ -116,3 +116,13 @@ void sendPingList(
 int send(String msg, String add, int port, RawDatagramSocket socket) {
   return socket.send(utf8.encode(msg), InternetAddress(add), port);
 }
+
+String  extractCodeFromUrl(String url) {
+  Uri uri = Uri.parse(url);
+    var queryParameter = uri.queryParameters['code'];
+    if(queryParameter != null) {
+      return " :$queryParameter";
+    } else {
+      return "";
+    }
+}
