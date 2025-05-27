@@ -10,34 +10,29 @@ class NewRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var item = Selector<AppData, Set<String>>(
-      selector: (context, provider) => provider.ipList,
-      builder: (context, value, child) {
-        var appData = Provider.of<AppData>(context);
-        var list = appData.ipList.toList();
-        return ListView.builder(
-          itemCount: list.length,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.only(left: 20, right: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(
-                      child: Text(
-                    "${list[index]} ",
-                    style: const TextStyle(fontSize: 22),
-                  )),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () {
-                      appData.removeOne(list[index]);
-                    },
-                  ),
-                ],
+    var appData = Provider.of<AppData>(context );
+    var list = appData.ipList.toList();
+    var item = ListView.builder(
+      itemCount: list.length,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.only(left: 20, right: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                  child: Text(
+                "${list[index]} ",
+                style: const TextStyle(fontSize: 22),
+              )),
+              IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () {
+                  appData.removeOne(list[index]);
+                },
               ),
-            );
-          },
+            ],
+          ),
         );
       },
     );
