@@ -51,6 +51,7 @@ class AppData with ChangeNotifier {
     if (logolist.length > 100) {
       logolist.removeAt(0);
     }
+    logolist = [...logolist];
     notifyListeners(); // 通知监听者更新
   }
 }

@@ -1,15 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
-import 'package:esop/utils/util.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'AppProvider.dart';
+import 'components/consoleDialog.dart';
 import 'components/device_button_list.dart';
 import 'components/search_text_field.dart';
+import 'components/startUDPListener.dart';
 import 'config/config.dart';
 import 'dto/Info.dart';
 import 'main.dart';
@@ -17,11 +15,10 @@ import 'main.dart';
 class HomeScreenState extends State<HomeScreen> {
   final FocusNode _focusNode = FocusNode();
 
-  final ScrollController _scrollController = ScrollController();
   final TextEditingController _controller =
-  TextEditingController(); // TextEditingController
+      TextEditingController(); // TextEditingController
   Set<Info> infos = {};
-  late RawDatagramSocket socket;
+
   String st = "";
   late Future<void> _loadDataFuture;
   bool _isSwitched = true;
@@ -31,8 +28,10 @@ class HomeScreenState extends State<HomeScreen> {
     super.initState();
     _loadDataFuture = Provider.of<AppData>(context, listen: false)
         .loadDataFromSharedPreferences();
-    startUDPListener();
+    startUDPListener(context, (Info info) => setState(() => infos.add(info)));
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -68,46 +67,13 @@ class HomeScreenState extends State<HomeScreen> {
       });
     }
 
-    var button = buildButtonListView(infolist, context, st, _isSwitched);
-    var search = buildSearchTextField(_controller, _focusNode, setSearchText);
-
     return Scaffold(
         appBar: AppBar(
           title: const Text('App'),
           actions: [
             IconButton(
               onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text("控制台输出"),
-                      content: SizedBox(
-                        width: screenWidth * 0.9,
-                        height: screenHeight * 0.9,
-                        child: SingleChildScrollView(
-                          controller: _scrollController,
-                          child: Consumer<AppData>(
-                            builder: (context, appData, child) {
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                if (_scrollController.hasClients) {
-                                  _scrollController.jumpTo(
-                                    _scrollController.position.maxScrollExtent,
-                                  );
-                                }
-                              });
-                              return Column(
-                                children: appData.logolist
-                                    .map((e) => Text(e))
-                                    .toList(),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                );
+                showLogDialog(context );
               },
               icon: const Icon(Icons.computer),
             ),
@@ -121,7 +87,9 @@ class HomeScreenState extends State<HomeScreen> {
             ),
             IconButton(
               icon: const Icon(Icons.select_all),
-              onPressed: () {},
+              onPressed: () {
+              //    todo
+              },
             ),
             IconButton(
               icon: const Icon(Icons.settings),
@@ -145,7 +113,7 @@ class HomeScreenState extends State<HomeScreen> {
                   constraints: BoxConstraints(
                     maxWidth: screenWidth * 0.5, // 设置最大宽度
                   ),
-                  child: search,
+                  child: buildSearchTextField(_controller, _focusNode, setSearchText),
                 ),
                 IconButton(
                   onPressed: () {
@@ -181,64 +149,14 @@ class HomeScreenState extends State<HomeScreen> {
                     )),
               ],
             ),
-            Expanded(child: button),
+            Expanded(child: buildButtonListView(infolist, context, st, _isSwitched)),
           ],
         ));
   }
 
-
-  void startUDPListener() async {
-    var app = context.read<AppData>(); // 使用 context.read() 获取 app 的值
-
-    socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 0);
-    socket.broadcastEnabled = true;
-    var listen = socket.listen((RawSocketEvent event) {
-      if (event == RawSocketEvent.read) {
-        Datagram? datagram = socket.receive();
-        if (datagram != null) {
-          var decode = utf8.decode(datagram.data);
-          if (kDebugMode) {
-            print(decode);
-          }
-          app.addlogo(decode);
-          if (decode.startsWith("{")) {
-            var info = Info.fromJson(json.decode(decode));
-            var source = "${datagram.address.address}:${datagram.port}";
-            info.source = source;
-            setState(() {
-              infos.add(info);
-            });
-          }
-        }
-      }
-    });
-    listen.onError((e, a) {
-      if (e is SocketException) {
-        app.addlogo("listen.onError");
-        app.addlogo(e.toString());
-        app.addlogo(a.toString());
-      }
-    });
-
-    Future.delayed(const Duration(seconds: 1), () {
-      sendPingList(
-        socket,
-        app.ipList.toList(),
-        app,
-      );
-      Timer.periodic(const Duration(seconds: 5), (timer) {
-        sendPingList(
-          socket,
-          app.ipList.toList(),
-          app,
-        );
-      });
-    });
-  }
-
   @override
   void dispose() {
-    _scrollController.dispose(); // 释放控制器
+    // _scrollController.dispose(); // 释放控制器
     super.dispose();
   }
 }
