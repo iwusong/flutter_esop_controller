@@ -1,5 +1,6 @@
 import 'package:esop/utils/util.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:prompt_dialog/prompt_dialog.dart';
 
 import '../dto/Info.dart';
@@ -81,7 +82,17 @@ void clickDeviceDialog(BuildContext context, Info info) {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 13),
-                      child: Text("来源:${clickInfo.source}"),
+                      child: Row(
+                        children: [
+                          Text("来源ip:${clickInfo.source.split(':')[0]}"),
+                          IconButton(
+                              onPressed: () => {
+                                    Clipboard.setData(ClipboardData(
+                                        text: clickInfo.source.split(':')[0]))
+                                  },
+                              icon: const Icon(Icons.copy_all)),
+                        ],
+                      ),
                     ),
                     const SizedBox(
                       height: 10,
@@ -101,7 +112,6 @@ void clickDeviceDialog(BuildContext context, Info info) {
                           buildButton("开绿", "rgb!01 05 00 02 ff 00 2D FA"),
                           buildButton("蜂鸣", "rgb!01 05 00 03 f0 00 79 CA"),
                           buildButton("红闪", "rgb!01 05 00 00 f0 00 89 CA"),
-
                         ]),
                   ],
                 )),

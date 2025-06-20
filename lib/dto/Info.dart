@@ -7,9 +7,10 @@ class Info {
   String source;
   String device;
   String code;
+  String appversion;
 
   Info(this.web, this.video, this.uuid, this.ip, this.name, this.source,
-      this.device, this.code);
+      this.device, this.code, this.appversion);
 
   @override
   bool operator ==(Object other) =>
@@ -32,6 +33,9 @@ class Info {
         source = json['source'] ?? "",
         name = json['name'] ?? "",
         code = json['code'] ?? "",
+        appversion = json['appversion'] != null
+            ? 'v${json['appversion']}'
+            : "旧版本",
         device = json['device'] ?? "";
 
   dynamic operator [](String key) {
@@ -52,6 +56,8 @@ class Info {
         return device;
       case 'code':
         return code;
+      case 'appversion':
+        return appversion;
       default:
         throw ArgumentError('Invalid key: $key');
     }
@@ -82,7 +88,10 @@ class Info {
         device = value;
         break;
       case 'code':
-        code = value; // 修正这里
+        code = value;
+        break;
+      case 'appversion':
+        appversion = appversion;
         break;
       default:
         throw ArgumentError('Invalid key: $key');

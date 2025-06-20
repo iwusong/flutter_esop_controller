@@ -18,12 +18,7 @@ ListView buildButtonListView(
             onPressed: () {
               clickDeviceDialog(context, infolist[index]);
             },
-            child: st == ""
-                ? Text(isSwitched
-                    ? infolist[index].name +
-                        extractCodeFromUrl(infolist[index].web)
-                    : infolist[index].source)
-                : Text(infolist[index].uuid.substring(0, 13)),
+            child: deviceButtonText(st, isSwitched, infolist, index),
           ),
         ),
       ),
@@ -31,3 +26,62 @@ ListView buildButtonListView(
   );
 }
 
+Widget deviceButtonText(
+    String st, bool isSwitched, List<Info> infolist, int index) {
+  if (st == "") {
+    if (isSwitched) {
+      var text =
+          Text(infolist[index].name + extractCodeFromUrl(infolist[index].web));
+      return Row(mainAxisSize: MainAxisSize.min, children: [
+        Text('${infolist[index].name}  ',
+            style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87)),
+        Column(
+          children: [
+            Text(
+              extractCodeFromUrl(infolist[index].web),
+              style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.deepOrangeAccent,
+                  fontWeight: FontWeight.w500),
+            ),
+            Text(
+              infolist[index].appversion,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: Colors.blue,
+              ),
+            ),
+          ],
+        ),
+      ]);
+    } else {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '${infolist[index].source.split(':')[0]} ',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+          ),
+          Text(
+            infolist[index].appversion,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: Colors.blue,
+            ),
+          ),
+        ],
+      );
+    }
+  } else {
+    return Text(infolist[index].uuid.substring(0, 13));
+  }
+}

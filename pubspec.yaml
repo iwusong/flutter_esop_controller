@@ -4,19 +4,19 @@ description: "A new Flutter project."
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
-# Read more about iOS versioning at
+# 下面定义了应用程序的版本号和内部版本号。
+#版本号是由点分隔的三个数字，如1.2.43
+# 后跟由a分隔的可选内部版本号。
+# 版本和构建器编号都可能在flutter中被覆盖
+# 通过分别指定 -- build-name和 -- build-number来构建。
+# 在Android中，build-name用作versionName，而build-number用作versionCode。
+# 在 https://developer.android.com/studio/publish/versioning 阅读有关Android版本控制的更多信息
+# 在iOS中，build-name用作CFBundleShortVersionString，而build-number用作CFBundleVersion。
+# 阅读有关iOS版本控制的更多信息，请参见
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-# In Windows, build-name is used as the major, minor, and patch parts
-# of the product and file versions while build-number is used as the build suffix.
-version: 2.1.5+26
+# 在Windows中，build-name用作产品和文件版本的主要、次要和修补部分，而build-number用作build后缀。
+
+version: 3.2.0+50
 
 environment:
   sdk: ^3.5.4

@@ -79,8 +79,8 @@ Future<bool> sendController(Info info, String cmd, {int timeout = 3}) async {
   return completer.future;
 }
 
-Future<bool> sendControllerWithLoadingInDialog(
-    BuildContext context, Info info, String cmd) async {
+Future<bool> sendControllerWithLoadingInDialog(BuildContext context, Info info,
+    String cmd) async {
   showLoadingInDialog(context);
   var ok = await sendController(info, cmd);
   if (context.mounted) {
@@ -99,9 +99,11 @@ int sendPing(RawDatagramSocket socket, String ip) {
   return send("ping", ip, 2369, socket);
 }
 
-void sendPingList(
-    RawDatagramSocket socket, List<String> ip, AppData app) async {
-  var dateTime = DateTime.now().millisecondsSinceEpoch;
+void sendPingList(RawDatagramSocket socket, List<String> ip,
+    AppData app) async {
+  var dateTime = DateTime
+      .now()
+      .millisecondsSinceEpoch;
   for (var o in ip) {
     app.addlogo("scan  $o");
     for (int i = 1; i <= 255; i++) {
@@ -109,7 +111,9 @@ void sendPingList(
       sendPing(socket, ip);
     }
   }
-  var i = DateTime.now().millisecondsSinceEpoch - dateTime;
+  var i = DateTime
+      .now()
+      .millisecondsSinceEpoch - dateTime;
   app.addlogo("扫描耗时 $i 毫秒");
 }
 
@@ -117,12 +121,13 @@ int send(String msg, String add, int port, RawDatagramSocket socket) {
   return socket.send(utf8.encode(msg), InternetAddress(add), port);
 }
 
-String  extractCodeFromUrl(String url) {
+String extractCodeFromUrl(String url) {
   Uri uri = Uri.parse(url);
-    var queryParameter = uri.queryParameters['code'];
-    if(queryParameter != null) {
-      return " :$queryParameter";
-    } else {
-      return "";
-    }
+  var queryParameter = uri.queryParameters['code'];
+  if (queryParameter != null) {
+    return queryParameter;
+  } else {
+    return "";
+  }
 }
+
