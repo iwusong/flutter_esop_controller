@@ -49,7 +49,6 @@ class HomeScreenState extends State<HomeScreen> {
 
   Widget buildContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
 
     List<Info> infolist;
 
@@ -97,7 +96,7 @@ class HomeScreenState extends State<HomeScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) {
-                    return const NewRoute();
+                    return const ConfigSetting();
                   }),
                 );
               },

@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import '../AppProvider.dart';
 import '../utils/util.dart';
 
-class NewRoute extends StatelessWidget {
-  const NewRoute({super.key});
+class ConfigSetting extends StatelessWidget {
+  const ConfigSetting({super.key});
 
   @override
   Widget build(BuildContext context) {
