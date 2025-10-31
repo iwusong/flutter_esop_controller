@@ -31,7 +31,11 @@ class HomeScreenState extends State<HomeScreen> {
     startUDPListener(context, (Info info) => setState(() => infos.add(info)));
   }
 
-
+  void setSearchText(String value) {
+    setState(() {
+      st = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +51,7 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
+
   Widget buildContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -60,11 +65,7 @@ class HomeScreenState extends State<HomeScreen> {
     } else {
       infolist = infos.toList()..sort((a, b) => a.source.compareTo(b.source));
     }
-    void setSearchText(String value) {
-      setState(() {
-        st = value;
-      });
-    }
+
 
     return Scaffold(
         appBar: AppBar(
@@ -140,7 +141,7 @@ class HomeScreenState extends State<HomeScreen> {
                               });
                             },
                             activeTrackColor: Colors.lightGreenAccent,
-                            activeColor: Colors.green,
+                            activeThumbColor: Colors.green,
                           ),
                         ),
                         Text(_isSwitched ? "设备名" : "ip地址"),

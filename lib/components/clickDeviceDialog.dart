@@ -106,6 +106,8 @@ void clickDeviceDialog(BuildContext context, Info info) {
                           buildButton("显示uuid", "uuid"),
                           buildButton("清理进程", "cle!"),
                           buildButton("打开设置", "set!"),
+                          buildButton("设置为看板", "type!1"),
+                          buildButton("设置为工艺", "type!2"),
                           buildButton("警报全关", "rgb!01 05 00 EF 00 00 FC 3F"),
                           buildButton("开红", "rgb!01 05 00 00 ff 00 8C 3A"),
                           buildButton("开黄", "rgb!01 05 00 01 ff 00 DD FA"),

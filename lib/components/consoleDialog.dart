@@ -13,7 +13,7 @@ void showLogDialog(BuildContext context) {
 }
 
 class LogDialog extends StatefulWidget {
-  const LogDialog({Key? key}) : super(key: key);
+  const LogDialog({super.key});
 
   @override
   LogDialogState createState() => LogDialogState();

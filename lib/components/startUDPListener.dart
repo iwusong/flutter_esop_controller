@@ -49,7 +49,7 @@ void startUDPListener(BuildContext context,
       app.ipList.toList(),
       app,
     );
-    Timer.periodic(const Duration(seconds: 5), (timer) {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
       sendPingList(
         socket,
         app.ipList.toList(),

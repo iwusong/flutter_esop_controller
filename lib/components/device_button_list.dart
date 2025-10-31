@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../dto/Info.dart';
-import '../utils/clickDeviceDialog.dart';
+import 'clickDeviceDialog.dart';
 import '../utils/util.dart';
 
 ListView buildButtonListView(
@@ -15,6 +15,19 @@ ListView buildButtonListView(
         children: List.generate(
           infolist.length,
           (index) => ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.resolveWith(
+                (states) {
+                  if (infolist[index].type == "1") {
+                    return Colors.green[100];
+                  }
+                  if (infolist[index].type == "2") {
+                    return Colors.black54;
+                  }
+                  return null;
+                },
+              ),
+            ),
             onPressed: () {
               clickDeviceDialog(context, infolist[index]);
             },
