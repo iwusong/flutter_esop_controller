@@ -28,7 +28,13 @@ class HomeScreenState extends State<HomeScreen> {
     super.initState();
     _loadDataFuture = Provider.of<AppData>(context, listen: false)
         .loadDataFromSharedPreferences();
-    startUDPListener(context, (Info info) => setState(() => infos.add(info)));
+    startUDPListener(context, (Info newInfo) {
+      setState(() {
+        // todo 性能待优化
+        infos.removeWhere((info) => info.uuid == newInfo.uuid);
+        infos.add(newInfo);
+      });
+    });
   }
 
   void setSearchText(String value) {
@@ -51,7 +57,6 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   Widget buildContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -66,14 +71,13 @@ class HomeScreenState extends State<HomeScreen> {
       infolist = infos.toList()..sort((a, b) => a.source.compareTo(b.source));
     }
 
-
     return Scaffold(
         appBar: AppBar(
           title: const Text('App'),
           actions: [
             IconButton(
               onPressed: () {
-                showLogDialog(context );
+                showLogDialog(context);
               },
               icon: const Icon(Icons.computer),
             ),
@@ -88,7 +92,7 @@ class HomeScreenState extends State<HomeScreen> {
             IconButton(
               icon: const Icon(Icons.select_all),
               onPressed: () {
-              //    todo
+                //    todo
               },
             ),
             IconButton(
@@ -113,7 +117,8 @@ class HomeScreenState extends State<HomeScreen> {
                   constraints: BoxConstraints(
                     maxWidth: screenWidth * 0.5, // 设置最大宽度
                   ),
-                  child: buildSearchTextField(_controller, _focusNode, setSearchText),
+                  child: buildSearchTextField(
+                      _controller, _focusNode, setSearchText),
                 ),
                 IconButton(
                   onPressed: () {
@@ -149,7 +154,8 @@ class HomeScreenState extends State<HomeScreen> {
                     )),
               ],
             ),
-            Expanded(child: buildButtonListView(infolist, context, st, _isSwitched)),
+            Expanded(
+                child: buildButtonListView(infolist, context, st, _isSwitched)),
           ],
         ));
   }

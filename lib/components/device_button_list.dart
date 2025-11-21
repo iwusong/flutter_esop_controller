@@ -15,14 +15,15 @@ ListView buildButtonListView(
         children: List.generate(
           infolist.length,
           (index) => ElevatedButton(
+            key: ValueKey(infolist[index].uuid + infolist[index].type),
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.resolveWith(
                 (states) {
                   if (infolist[index].type == "1") {
-                    return Colors.green[100];
+                    return Colors.deepOrange[100];
                   }
                   if (infolist[index].type == "2") {
-                    return Colors.black54;
+                    return Colors.black12;
                   }
                   return null;
                 },
@@ -31,7 +32,7 @@ ListView buildButtonListView(
             onPressed: () {
               clickDeviceDialog(context, infolist[index]);
             },
-            child: deviceButtonText(st, isSwitched, infolist, index),
+            child: deviceButtonText(st, isSwitched, infolist[index]),
           ),
         ),
       ),
@@ -39,14 +40,11 @@ ListView buildButtonListView(
   );
 }
 
-Widget deviceButtonText(
-    String st, bool isSwitched, List<Info> infolist, int index) {
+Widget deviceButtonText(String st, bool isSwitched, Info devInfo) {
   if (st == "") {
     if (isSwitched) {
-      var text =
-          Text(infolist[index].name + extractCodeFromUrl(infolist[index].web));
       return Row(mainAxisSize: MainAxisSize.min, children: [
-        Text('${infolist[index].name}  ',
+        Text('${devInfo.name}  ',
             style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -54,14 +52,14 @@ Widget deviceButtonText(
         Column(
           children: [
             Text(
-              extractCodeFromUrl(infolist[index].web),
+              extractCodeFromUrl(devInfo.web),
               style: const TextStyle(
                   fontSize: 12,
                   color: Colors.deepOrangeAccent,
                   fontWeight: FontWeight.w500),
             ),
             Text(
-              infolist[index].appversion,
+              devInfo.appversion,
               style: const TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
@@ -76,7 +74,7 @@ Widget deviceButtonText(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            '${infolist[index].source.split(':')[0]} ',
+            '${devInfo.source.split(':')[0]} ',
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -84,7 +82,7 @@ Widget deviceButtonText(
             ),
           ),
           Text(
-            infolist[index].appversion,
+            devInfo.appversion,
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
@@ -95,6 +93,6 @@ Widget deviceButtonText(
       );
     }
   } else {
-    return Text(infolist[index].uuid.substring(0, 13));
+    return Text(devInfo.uuid.substring(0, 13));
   }
 }
