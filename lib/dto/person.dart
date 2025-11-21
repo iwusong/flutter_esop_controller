@@ -3,11 +3,11 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
 // 必要的：关联 `main.dart` 到 Freezed 代码生成器
-part 'InfoNew.freezed.dart';
+part 'person.freezed.dart';
 
 // 可选的：因为 Person 类是可序列化的，所以我们必须添加这一行。
 // 但是如果 Person 不是可序列化的，我们可以跳过它。
-part 'InfoNew.g.dart';
+part 'person.g.dart';
 
 @unfreezed
 abstract class Person with _$Person {
