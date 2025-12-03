@@ -23,7 +23,7 @@ void startUDPListener(BuildContext context,
       if (datagram != null) {
         var decode = utf8.decode(datagram.data);
         if (kDebugMode) {
-          print(decode);
+          // print(decode);
         }
         app.addlogo(decode);
         if (decode.startsWith("{")) {
@@ -49,7 +49,7 @@ void startUDPListener(BuildContext context,
       app.ipList.toList(),
       app,
     );
-    Timer.periodic(const Duration(seconds: 1), (timer) {
+    Timer.periodic(const Duration(seconds: 5), (timer) {
       sendPingList(
         socket,
         app.ipList.toList(),

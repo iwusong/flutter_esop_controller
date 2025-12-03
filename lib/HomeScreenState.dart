@@ -92,7 +92,7 @@ class HomeScreenState extends State<HomeScreen> {
             IconButton(
               icon: const Icon(Icons.select_all),
               onPressed: () {
-                //    todo
+                //    todo 多选操作
               },
             ),
             IconButton(
@@ -115,7 +115,7 @@ class HomeScreenState extends State<HomeScreen> {
               children: [
                 Container(
                   constraints: BoxConstraints(
-                    maxWidth: screenWidth * 0.5, // 设置最大宽度
+                    maxWidth: screenWidth * 0.4, // 设置最大宽度
                   ),
                   child: buildSearchTextField(
                       _controller, _focusNode, setSearchText),
@@ -132,7 +132,7 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
                 Container(
                     constraints: BoxConstraints(
-                      maxWidth: screenWidth * 0.3, // 设置最大宽度
+                      maxWidth: screenWidth * 0.4, // 设置最大宽度
                     ),
                     child: Row(
                       children: [

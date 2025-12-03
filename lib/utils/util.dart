@@ -57,7 +57,7 @@ Future<bool> sendController(Info info, String cmd, {int timeout = 3}) async {
       Datagram? datagram = socket.receive();
       if (datagram != null) {
         String decode = utf8.decode(datagram.data);
-        print(decode);
+        // print(decode);
         if (decode == cmd) {
           print("success");
           timer.cancel();

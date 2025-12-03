@@ -45,7 +45,7 @@ class AppData with ChangeNotifier {
 
   void addlogo(String value) {
     if (kDebugMode) {
-      print(value);
+      // print(value);
     }
     logolist.add(value);
     if (logolist.length > 100) {

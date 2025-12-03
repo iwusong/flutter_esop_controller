@@ -41,10 +41,13 @@ ListView buildButtonListView(
 }
 
 Widget deviceButtonText(String st, bool isSwitched, Info devInfo) {
+  String appversion =
+      devInfo.appversion == 0 ? "旧版本" : devInfo.appversion.toString();
+
   if (st == "") {
     if (isSwitched) {
       return Row(mainAxisSize: MainAxisSize.min, children: [
-        Text('${devInfo.name}  ',
+        Text('${devInfo.name} ',
             style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -58,14 +61,27 @@ Widget deviceButtonText(String st, bool isSwitched, Info devInfo) {
                   color: Colors.deepOrangeAccent,
                   fontWeight: FontWeight.w500),
             ),
-            Text(
-              devInfo.appversion,
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: Colors.blue,
-              ),
-            ),
+            Row(
+              children: [
+                Text(
+                  appversion,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.blue,
+                  ),
+                ),
+                Text(
+                  devInfo.devicesList.isEmpty?" ":"外设:${devInfo.devicesList.length}",
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            )
+
           ],
         ),
       ]);
@@ -82,7 +98,7 @@ Widget deviceButtonText(String st, bool isSwitched, Info devInfo) {
             ),
           ),
           Text(
-            devInfo.appversion,
+            appversion,
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,

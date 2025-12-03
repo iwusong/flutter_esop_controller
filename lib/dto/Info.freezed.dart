@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'person.dart';
+part of 'Info.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -13,7 +13,7 @@ part of 'person.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$Person implements DiagnosticableTreeMixin {
+mixin _$Info implements DiagnosticableTreeMixin {
   String get web;
   set web(String value);
   String get video;
@@ -28,27 +28,33 @@ mixin _$Person implements DiagnosticableTreeMixin {
   set source(String value);
   String get device;
   set device(String value);
+  String get SM2D;
+  set SM2D(String value);
+  @JsonKey(name: 'devicesInfo')
+  List<DeviceItem> get devicesList;
+  @JsonKey(name: 'devicesInfo')
+  set devicesList(List<DeviceItem> value);
   String get code;
   set code(String value);
   String get type;
   set type(String value);
-  dynamic get appversion;
-  set appversion(dynamic value);
+  int get appversion;
+  set appversion(int value);
 
-  /// Create a copy of Person
+  /// Create a copy of Info
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $PersonCopyWith<Person> get copyWith =>
-      _$PersonCopyWithImpl<Person>(this as Person, _$identity);
+  $InfoCopyWith<Info> get copyWith =>
+      _$InfoCopyWithImpl<Info>(this as Info, _$identity);
 
-  /// Serializes this Person to a JSON map.
+  /// Serializes this Info to a JSON map.
   Map<String, dynamic> toJson();
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     properties
-      ..add(DiagnosticsProperty('type', 'Person'))
+      ..add(DiagnosticsProperty('type', 'Info'))
       ..add(DiagnosticsProperty('web', web))
       ..add(DiagnosticsProperty('video', video))
       ..add(DiagnosticsProperty('uuid', uuid))
@@ -56,6 +62,8 @@ mixin _$Person implements DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('source', source))
       ..add(DiagnosticsProperty('device', device))
+      ..add(DiagnosticsProperty('SM2D', SM2D))
+      ..add(DiagnosticsProperty('devicesList', devicesList))
       ..add(DiagnosticsProperty('code', code))
       ..add(DiagnosticsProperty('type', type))
       ..add(DiagnosticsProperty('appversion', appversion));
@@ -63,14 +71,14 @@ mixin _$Person implements DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Person(web: $web, video: $video, uuid: $uuid, ip: $ip, name: $name, source: $source, device: $device, code: $code, type: $type, appversion: $appversion)';
+    return 'Info(web: $web, video: $video, uuid: $uuid, ip: $ip, name: $name, source: $source, device: $device, SM2D: $SM2D, devicesList: $devicesList, code: $code, type: $type, appversion: $appversion)';
   }
 }
 
 /// @nodoc
-abstract mixin class $PersonCopyWith<$Res> {
-  factory $PersonCopyWith(Person value, $Res Function(Person) _then) =
-      _$PersonCopyWithImpl;
+abstract mixin class $InfoCopyWith<$Res> {
+  factory $InfoCopyWith(Info value, $Res Function(Info) _then) =
+      _$InfoCopyWithImpl;
   @useResult
   $Res call(
       {String web,
@@ -80,19 +88,21 @@ abstract mixin class $PersonCopyWith<$Res> {
       String name,
       String source,
       String device,
+      String SM2D,
+      @JsonKey(name: 'devicesInfo') List<DeviceItem> devicesList,
       String code,
       String type,
-      dynamic appversion});
+      int appversion});
 }
 
 /// @nodoc
-class _$PersonCopyWithImpl<$Res> implements $PersonCopyWith<$Res> {
-  _$PersonCopyWithImpl(this._self, this._then);
+class _$InfoCopyWithImpl<$Res> implements $InfoCopyWith<$Res> {
+  _$InfoCopyWithImpl(this._self, this._then);
 
-  final Person _self;
-  final $Res Function(Person) _then;
+  final Info _self;
+  final $Res Function(Info) _then;
 
-  /// Create a copy of Person
+  /// Create a copy of Info
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -104,9 +114,11 @@ class _$PersonCopyWithImpl<$Res> implements $PersonCopyWith<$Res> {
     Object? name = null,
     Object? source = null,
     Object? device = null,
+    Object? SM2D = null,
+    Object? devicesList = null,
     Object? code = null,
     Object? type = null,
-    Object? appversion = freezed,
+    Object? appversion = null,
   }) {
     return _then(_self.copyWith(
       web: null == web
@@ -137,6 +149,14 @@ class _$PersonCopyWithImpl<$Res> implements $PersonCopyWith<$Res> {
           ? _self.device
           : device // ignore: cast_nullable_to_non_nullable
               as String,
+      SM2D: null == SM2D
+          ? _self.SM2D
+          : SM2D // ignore: cast_nullable_to_non_nullable
+              as String,
+      devicesList: null == devicesList
+          ? _self.devicesList
+          : devicesList // ignore: cast_nullable_to_non_nullable
+              as List<DeviceItem>,
       code: null == code
           ? _self.code
           : code // ignore: cast_nullable_to_non_nullable
@@ -145,16 +165,16 @@ class _$PersonCopyWithImpl<$Res> implements $PersonCopyWith<$Res> {
           ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as String,
-      appversion: freezed == appversion
+      appversion: null == appversion
           ? _self.appversion
           : appversion // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as int,
     ));
   }
 }
 
-/// Adds pattern-matching-related methods to [Person].
-extension PersonPatterns on Person {
+/// Adds pattern-matching-related methods to [Info].
+extension InfoPatterns on Info {
   /// A variant of `map` that fallback to returning `orElse`.
   ///
   /// It is equivalent to doing:
@@ -169,12 +189,12 @@ extension PersonPatterns on Person {
 
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>(
-    TResult Function(_Person value)? $default, {
+    TResult Function(_Info value)? $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _Person() when $default != null:
+      case _Info() when $default != null:
         return $default(_that);
       case _:
         return orElse();
@@ -196,11 +216,11 @@ extension PersonPatterns on Person {
 
   @optionalTypeArgs
   TResult map<TResult extends Object?>(
-    TResult Function(_Person value) $default,
+    TResult Function(_Info value) $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Person():
+      case _Info():
         return $default(_that);
       case _:
         throw StateError('Unexpected subclass');
@@ -221,11 +241,11 @@ extension PersonPatterns on Person {
 
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>(
-    TResult? Function(_Person value)? $default,
+    TResult? Function(_Info value)? $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Person() when $default != null:
+      case _Info() when $default != null:
         return $default(_that);
       case _:
         return null;
@@ -254,15 +274,17 @@ extension PersonPatterns on Person {
             String name,
             String source,
             String device,
+            String SM2D,
+            @JsonKey(name: 'devicesInfo') List<DeviceItem> devicesList,
             String code,
             String type,
-            dynamic appversion)?
+            int appversion)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _Person() when $default != null:
+      case _Info() when $default != null:
         return $default(
             _that.web,
             _that.video,
@@ -271,6 +293,8 @@ extension PersonPatterns on Person {
             _that.name,
             _that.source,
             _that.device,
+            _that.SM2D,
+            _that.devicesList,
             _that.code,
             _that.type,
             _that.appversion);
@@ -302,14 +326,16 @@ extension PersonPatterns on Person {
             String name,
             String source,
             String device,
+            String SM2D,
+            @JsonKey(name: 'devicesInfo') List<DeviceItem> devicesList,
             String code,
             String type,
-            dynamic appversion)
+            int appversion)
         $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Person():
+      case _Info():
         return $default(
             _that.web,
             _that.video,
@@ -318,6 +344,8 @@ extension PersonPatterns on Person {
             _that.name,
             _that.source,
             _that.device,
+            _that.SM2D,
+            _that.devicesList,
             _that.code,
             _that.type,
             _that.appversion);
@@ -348,14 +376,16 @@ extension PersonPatterns on Person {
             String name,
             String source,
             String device,
+            String SM2D,
+            @JsonKey(name: 'devicesInfo') List<DeviceItem> devicesList,
             String code,
             String type,
-            dynamic appversion)?
+            int appversion)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Person() when $default != null:
+      case _Info() when $default != null:
         return $default(
             _that.web,
             _that.video,
@@ -364,6 +394,8 @@ extension PersonPatterns on Person {
             _that.name,
             _that.source,
             _that.device,
+            _that.SM2D,
+            _that.devicesList,
             _that.code,
             _that.type,
             _that.appversion);
@@ -375,8 +407,8 @@ extension PersonPatterns on Person {
 
 /// @nodoc
 @JsonSerializable()
-class _Person extends Person with DiagnosticableTreeMixin {
-  _Person(
+class _Info extends Info with DiagnosticableTreeMixin {
+  _Info(
       {this.web = "",
       this.video = "",
       this.uuid = "",
@@ -384,11 +416,13 @@ class _Person extends Person with DiagnosticableTreeMixin {
       this.name = "",
       this.source = "",
       this.device = "",
+      this.SM2D = "",
+      @JsonKey(name: 'devicesInfo') this.devicesList = const [],
       this.code = "",
       this.type = "",
-      this.appversion})
+      this.appversion = 0})
       : super._();
-  factory _Person.fromJson(Map<String, dynamic> json) => _$PersonFromJson(json);
+  factory _Info.fromJson(Map<String, dynamic> json) => _$InfoFromJson(json);
 
   @override
   @JsonKey()
@@ -413,24 +447,31 @@ class _Person extends Person with DiagnosticableTreeMixin {
   String device;
   @override
   @JsonKey()
+  String SM2D;
+  @override
+  @JsonKey(name: 'devicesInfo')
+  List<DeviceItem> devicesList;
+  @override
+  @JsonKey()
   String code;
   @override
   @JsonKey()
   String type;
   @override
-  dynamic appversion;
+  @JsonKey()
+  int appversion;
 
-  /// Create a copy of Person
+  /// Create a copy of Info
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$PersonCopyWith<_Person> get copyWith =>
-      __$PersonCopyWithImpl<_Person>(this, _$identity);
+  _$InfoCopyWith<_Info> get copyWith =>
+      __$InfoCopyWithImpl<_Info>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$PersonToJson(
+    return _$InfoToJson(
       this,
     );
   }
@@ -438,7 +479,7 @@ class _Person extends Person with DiagnosticableTreeMixin {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     properties
-      ..add(DiagnosticsProperty('type', 'Person'))
+      ..add(DiagnosticsProperty('type', 'Info'))
       ..add(DiagnosticsProperty('web', web))
       ..add(DiagnosticsProperty('video', video))
       ..add(DiagnosticsProperty('uuid', uuid))
@@ -446,6 +487,8 @@ class _Person extends Person with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('source', source))
       ..add(DiagnosticsProperty('device', device))
+      ..add(DiagnosticsProperty('SM2D', SM2D))
+      ..add(DiagnosticsProperty('devicesList', devicesList))
       ..add(DiagnosticsProperty('code', code))
       ..add(DiagnosticsProperty('type', type))
       ..add(DiagnosticsProperty('appversion', appversion));
@@ -453,14 +496,14 @@ class _Person extends Person with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Person(web: $web, video: $video, uuid: $uuid, ip: $ip, name: $name, source: $source, device: $device, code: $code, type: $type, appversion: $appversion)';
+    return 'Info(web: $web, video: $video, uuid: $uuid, ip: $ip, name: $name, source: $source, device: $device, SM2D: $SM2D, devicesList: $devicesList, code: $code, type: $type, appversion: $appversion)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$PersonCopyWith<$Res> implements $PersonCopyWith<$Res> {
-  factory _$PersonCopyWith(_Person value, $Res Function(_Person) _then) =
-      __$PersonCopyWithImpl;
+abstract mixin class _$InfoCopyWith<$Res> implements $InfoCopyWith<$Res> {
+  factory _$InfoCopyWith(_Info value, $Res Function(_Info) _then) =
+      __$InfoCopyWithImpl;
   @override
   @useResult
   $Res call(
@@ -471,19 +514,21 @@ abstract mixin class _$PersonCopyWith<$Res> implements $PersonCopyWith<$Res> {
       String name,
       String source,
       String device,
+      String SM2D,
+      @JsonKey(name: 'devicesInfo') List<DeviceItem> devicesList,
       String code,
       String type,
-      dynamic appversion});
+      int appversion});
 }
 
 /// @nodoc
-class __$PersonCopyWithImpl<$Res> implements _$PersonCopyWith<$Res> {
-  __$PersonCopyWithImpl(this._self, this._then);
+class __$InfoCopyWithImpl<$Res> implements _$InfoCopyWith<$Res> {
+  __$InfoCopyWithImpl(this._self, this._then);
 
-  final _Person _self;
-  final $Res Function(_Person) _then;
+  final _Info _self;
+  final $Res Function(_Info) _then;
 
-  /// Create a copy of Person
+  /// Create a copy of Info
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -495,11 +540,13 @@ class __$PersonCopyWithImpl<$Res> implements _$PersonCopyWith<$Res> {
     Object? name = null,
     Object? source = null,
     Object? device = null,
+    Object? SM2D = null,
+    Object? devicesList = null,
     Object? code = null,
     Object? type = null,
-    Object? appversion = freezed,
+    Object? appversion = null,
   }) {
-    return _then(_Person(
+    return _then(_Info(
       web: null == web
           ? _self.web
           : web // ignore: cast_nullable_to_non_nullable
@@ -528,6 +575,14 @@ class __$PersonCopyWithImpl<$Res> implements _$PersonCopyWith<$Res> {
           ? _self.device
           : device // ignore: cast_nullable_to_non_nullable
               as String,
+      SM2D: null == SM2D
+          ? _self.SM2D
+          : SM2D // ignore: cast_nullable_to_non_nullable
+              as String,
+      devicesList: null == devicesList
+          ? _self.devicesList
+          : devicesList // ignore: cast_nullable_to_non_nullable
+              as List<DeviceItem>,
       code: null == code
           ? _self.code
           : code // ignore: cast_nullable_to_non_nullable
@@ -536,10 +591,10 @@ class __$PersonCopyWithImpl<$Res> implements _$PersonCopyWith<$Res> {
           ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as String,
-      appversion: freezed == appversion
+      appversion: null == appversion
           ? _self.appversion
           : appversion // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as int,
     ));
   }
 }

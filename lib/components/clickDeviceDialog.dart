@@ -5,6 +5,17 @@ import 'package:prompt_dialog/prompt_dialog.dart';
 
 import '../dto/Info.dart';
 
+typedef InfoUpdater = Info Function(Info info, dynamic value);
+
+final Map<String, InfoUpdater> _infoUpdaters = {
+  'name': (Info info, dynamic value) => info.copyWith(name: value),
+  'code': (Info info, dynamic value) => info.copyWith(code: value),
+  'web': (Info info, dynamic value) => info.copyWith(web: value),
+  'video': (Info info, dynamic value) => info.copyWith(video: value),
+  'ip': (Info info, dynamic value) => info.copyWith(ip: value),
+  'SM2D': (Info info, dynamic value) => info.copyWith(SM2D: value),
+};
+
 void clickDeviceDialog(BuildContext context, Info info) {
   showDialog(
     context: context,
@@ -21,12 +32,13 @@ void clickDeviceDialog(BuildContext context, Info info) {
         );
       }
 
-      buildEditButton(String title, StateSetter setState, String key) {
+      buildEditButton(
+          String title, StateSetter setState, String key, String oldvalue) {
         return TextButton(
           onPressed: () async {
             var s = await prompt(
               context,
-              initialValue: clickInfo[key],
+              initialValue: oldvalue,
               maxLines: 3,
               textOK: const Text('发送'),
               textCancel: const Text('取消'),
@@ -35,10 +47,9 @@ void clickDeviceDialog(BuildContext context, Info info) {
               var bool = await sendControllerWithLoadingInDialog(
                   context, info, "$key!$s");
               if (bool) {
+                final setter = _infoUpdaters[key];
                 setState(() {
-                  clickInfo[key] = s;
-                  print(key);
-                  print(clickInfo);
+                  clickInfo = setter!(clickInfo, s);
                 });
               }
             }
@@ -46,7 +57,7 @@ void clickDeviceDialog(BuildContext context, Info info) {
           child: Align(
             alignment: Alignment.centerLeft, // 左对齐
             child: Text(
-              "$title:" + clickInfo[key],
+              "$title:$oldvalue",
               textAlign: TextAlign.start,
             ),
           ),
@@ -71,11 +82,12 @@ void clickDeviceDialog(BuildContext context, Info info) {
                             fontSize: 26, fontWeight: FontWeight.bold),
                       ),
                     ),
-                    buildEditButton("设备名称", setState, "name"),
-                    buildEditButton("设备编码", setState, "code"),
-                    buildEditButton("网页地址", setState, "web"),
-                    buildEditButton("视频地址", setState, "video"),
-                    buildEditButton("目标服务器", setState, "ip"),
+                    buildEditButton("设备名称", setState, "name", clickInfo.name),
+                    buildEditButton("设备编码", setState, "code", clickInfo.code),
+                    buildEditButton("网页地址", setState, "web", clickInfo.web),
+                    buildEditButton("视频地址", setState, "video", clickInfo.video),
+                    buildEditButton("目标服务器", setState, "ip", clickInfo.ip),
+                    buildEditButton("扫描枪接口", setState, "SM2D", clickInfo.SM2D),
                     Padding(
                       padding: const EdgeInsets.only(left: 13),
                       child: Text("uuid:${clickInfo.uuid}"),
@@ -94,6 +106,11 @@ void clickDeviceDialog(BuildContext context, Info info) {
                         ],
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 13),
+                      child: Text(
+                          "外设信息:${clickInfo.devicesList.map((e) => e.productName).toString()}"),
+                    ),
                     const SizedBox(
                       height: 10,
                     ),
@@ -108,12 +125,14 @@ void clickDeviceDialog(BuildContext context, Info info) {
                           buildButton("打开设置", "set!"),
                           buildButton("设置为看板", "type!1"),
                           buildButton("设置为工艺", "type!2"),
+                          buildButton("检测外设", "usb!"),
                           buildButton("警报全关", "rgb!01 05 00 EF 00 00 FC 3F"),
                           buildButton("开红", "rgb!01 05 00 00 ff 00 8C 3A"),
                           buildButton("开黄", "rgb!01 05 00 01 ff 00 DD FA"),
                           buildButton("开绿", "rgb!01 05 00 02 ff 00 2D FA"),
                           buildButton("蜂鸣", "rgb!01 05 00 03 f0 00 79 CA"),
                           buildButton("红闪", "rgb!01 05 00 00 f0 00 89 CA"),
+                          buildButton("重启", "restart!"),
                         ]),
                   ],
                 )),
