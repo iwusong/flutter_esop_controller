@@ -49,7 +49,8 @@ void clickDeviceDialog(BuildContext context, Info info) {
               if (bool) {
                 final setter = _infoUpdaters[key];
                 setState(() {
-                  clickInfo = setter!(clickInfo, s);
+                  info = setter!(clickInfo, s);
+
                 });
               }
             }
