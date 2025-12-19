@@ -21,6 +21,9 @@ version: 3.2.0+50
 environment:
   sdk: ^3.5.4
 
+
+scripts:
+  dart run build_runner watch
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
 # consider running `flutter pub upgrade --major-versions`. Alternatively,
