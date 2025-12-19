@@ -23,11 +23,10 @@ abstract class Info with _$Info {
     @Default("") String source,
     @Default("") String device,
     @Default("") String SM2D,
-    @Default([ ])
+    @Default([])
     @JsonKey(
-        name: 'devicesInfo',
-
-        ) // JsonKey在前
+      name: 'devicesInfo',
+    ) // JsonKey在前
     List<DeviceItem> devicesList,
     @Default("") String code,
     @Default("") String type,
@@ -43,5 +42,15 @@ abstract class Info with _$Info {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Info && runtimeType == other.runtimeType && uuid == other.uuid;
-}
 
+  dynamic operator [](String key) {
+    final json = toJson();
+    return json[key];
+  }
+
+  Info getKeyUpdateInfo(String key, dynamic value) {
+    final json = toJson();
+    json[key] = value;
+    return Info.fromJson(json);
+  }
+}

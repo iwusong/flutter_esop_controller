@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'AppProvider.dart';
+import 'components/clickDeviceDialog.dart';
 import 'components/consoleDialog.dart';
 import 'components/device_button_list.dart';
 import 'components/search_text_field.dart';
@@ -29,11 +30,15 @@ class HomeScreenState extends State<HomeScreen> {
     _loadDataFuture = Provider.of<AppData>(context, listen: false)
         .loadDataFromSharedPreferences();
     startUDPListener(context, (Info newInfo) {
-      setState(() {
-        // todo 性能待优化
-        infos.removeWhere((info) => info.uuid == newInfo.uuid);
-        infos.add(newInfo);
-      });
+      setInfoListUpdate(newInfo);
+    });
+  }
+
+  void setInfoListUpdate(Info newInfo) {
+    setState(() {
+      // todo 性能待优化
+      infos.removeWhere((info) => info.uuid == newInfo.uuid);
+      infos.add(newInfo);
     });
   }
 
@@ -71,93 +76,134 @@ class HomeScreenState extends State<HomeScreen> {
       infolist = infos.toList()..sort((a, b) => a.source.compareTo(b.source));
     }
 
+    var st2 = st;
+    var isSwitched = _isSwitched;
+    var searchInput = Container(
+      constraints: BoxConstraints(
+        maxWidth: screenWidth * 0.4, // 设置最大宽度
+      ),
+      child: buildSearchTextField(_controller, _focusNode, setSearchText),
+    );
+    var cleanButton = IconButton(
+      onPressed: () {
+        _controller.clear();
+        _focusNode.unfocus();
+        setState(() {
+          st = "";
+        });
+      },
+      icon: const Icon(Icons.close),
+    );
+    var ipOrNameSwitch = Container(
+        constraints: BoxConstraints(
+          maxWidth: screenWidth * 0.4, // 设置最大宽度
+        ),
+        child: Row(
+          children: [
+            Transform.scale(
+              scale: 0.7,
+              child: Switch(
+                value: _isSwitched,
+                onChanged: (value) {
+                  setState(() {
+                    _isSwitched = value;
+                  });
+                },
+                activeTrackColor: Colors.lightGreenAccent,
+                activeThumbColor: Colors.green,
+              ),
+            ),
+            Text(_isSwitched ? "设备名" : "ip地址"),
+          ],
+        ));
     return Scaffold(
         appBar: AppBar(
           title: const Text('App'),
-          actions: [
-            IconButton(
-              onPressed: () {
-                showLogDialog(context);
-              },
-              icon: const Icon(Icons.computer),
-            ),
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  infos.clear();
-                });
-              },
-              icon: const Icon(Icons.refresh),
-            ),
-            IconButton(
-              icon: const Icon(Icons.select_all),
-              onPressed: () {
-                //    todo 多选操作
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) {
-                    return const ConfigSetting();
-                  }),
-                );
-              },
-            ),
-          ],
+          actions: actions(context),
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Container(
-                  constraints: BoxConstraints(
-                    maxWidth: screenWidth * 0.4, // 设置最大宽度
-                  ),
-                  child: buildSearchTextField(
-                      _controller, _focusNode, setSearchText),
-                ),
-                IconButton(
-                  onPressed: () {
-                    _controller.clear();
-                    _focusNode.unfocus();
-                    setState(() {
-                      st = "";
-                    });
-                  },
-                  icon: const Icon(Icons.close),
-                ),
-                Container(
-                    constraints: BoxConstraints(
-                      maxWidth: screenWidth * 0.4, // 设置最大宽度
-                    ),
-                    child: Row(
-                      children: [
-                        Transform.scale(
-                          scale: 0.7,
-                          child: Switch(
-                            value: _isSwitched,
-                            onChanged: (value) {
-                              setState(() {
-                                _isSwitched = value;
-                              });
-                            },
-                            activeTrackColor: Colors.lightGreenAccent,
-                            activeThumbColor: Colors.green,
-                          ),
-                        ),
-                        Text(_isSwitched ? "设备名" : "ip地址"),
-                      ],
-                    )),
+                searchInput,
+                cleanButton,
+                ipOrNameSwitch,
               ],
             ),
             Expanded(
-                child: buildButtonListView(infolist, context, st, _isSwitched)),
+                child: ListView(
+              padding: const EdgeInsets.all(16.0),
+              children: [
+                Wrap(
+                  spacing: 10.0, // 主轴方向间距
+                  runSpacing: 5, // 换行间距
+                  children: List.generate(
+                    infolist.length,
+                    (index) => ElevatedButton(
+                      // key:
+                      //     ValueKey(infolist[index].uuid + infolist[index].type),
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.resolveWith(
+                          (states) {
+                            if (infolist[index].type == "1") {
+                              return Colors.deepOrange[100];
+                            }
+                            if (infolist[index].type == "2") {
+                              return Colors.black12;
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      onPressed: () {
+                        clickDeviceDialog(
+                            context, infolist[index], setInfoListUpdate);
+                      },
+                      child: deviceButtonText(st2, isSwitched, infolist[index]),
+                    ),
+                  ),
+                ),
+              ],
+            )),
           ],
         ));
+  }
+
+  List<Widget> actions(BuildContext context) {
+    return [
+      IconButton(
+        onPressed: () {
+          showLogDialog(context);
+        },
+        icon: const Icon(Icons.computer),
+      ),
+      IconButton(
+        onPressed: () {
+          setState(() {
+            infos.clear();
+          });
+        },
+        icon: const Icon(Icons.refresh),
+      ),
+      IconButton(
+        icon: const Icon(Icons.select_all),
+        onPressed: () {
+          //    todo 多选操作
+        },
+      ),
+      IconButton(
+        icon: const Icon(Icons.settings),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) {
+              return const ConfigSetting();
+            }),
+          );
+        },
+      ),
+    ];
   }
 
   @override

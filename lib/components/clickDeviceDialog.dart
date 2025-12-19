@@ -5,66 +5,54 @@ import 'package:prompt_dialog/prompt_dialog.dart';
 
 import '../dto/Info.dart';
 
-typedef InfoUpdater = Info Function(Info info, dynamic value);
+void clickDeviceDialog(
+    BuildContext context, Info info, ValueChanged<Info> func) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final screenHeight = MediaQuery.of(context).size.height;
+  TextButton buildEditButton(String title, String key, StateSetter setter) {
+    return TextButton(
+      onPressed: () async {
+        var s = await prompt(
+          context,
+          initialValue: info[key],
+          maxLines: 3,
+          textOK: const Text('发送'),
+          textCancel: const Text('取消'),
+        );
+        if (s != null && context.mounted) {
+          var bool =
+              await sendControllerWithLoadingInDialog(context, info, "$key!$s");
+          if (bool) {
+            var keyUpdateInfo = info.getKeyUpdateInfo(key, s);
+            func(keyUpdateInfo);
+            setter(() {
+              info = keyUpdateInfo;
+            });
+          }
+        }
+      },
+      child: Align(
+        alignment: Alignment.centerLeft, // 左对齐
+        child: Text(
+          "$title:${info[key]}",
+          textAlign: TextAlign.start,
+        ),
+      ),
+    );
+  }
 
-final Map<String, InfoUpdater> _infoUpdaters = {
-  'name': (Info info, dynamic value) => info.copyWith(name: value),
-  'code': (Info info, dynamic value) => info.copyWith(code: value),
-  'web': (Info info, dynamic value) => info.copyWith(web: value),
-  'video': (Info info, dynamic value) => info.copyWith(video: value),
-  'ip': (Info info, dynamic value) => info.copyWith(ip: value),
-  'SM2D': (Info info, dynamic value) => info.copyWith(SM2D: value),
-};
+  ElevatedButton buildButton(String buttonText, String cmd) {
+    return ElevatedButton(
+      onPressed: () async {
+        sendControllerWithLoadingInDialog(context, info, cmd);
+      },
+      child: Text(buttonText),
+    );
+  }
 
-void clickDeviceDialog(BuildContext context, Info info) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      var clickInfo = info;
-      final screenWidth = MediaQuery.of(context).size.width;
-      final screenHeight = MediaQuery.of(context).size.height;
-      ElevatedButton buildButton(String buttonText, String cmd) {
-        return ElevatedButton(
-          onPressed: () async {
-            sendControllerWithLoadingInDialog(context, info, cmd);
-          },
-          child: Text(buttonText),
-        );
-      }
-
-      buildEditButton(
-          String title, StateSetter setState, String key, String oldvalue) {
-        return TextButton(
-          onPressed: () async {
-            var s = await prompt(
-              context,
-              initialValue: oldvalue,
-              maxLines: 3,
-              textOK: const Text('发送'),
-              textCancel: const Text('取消'),
-            );
-            if (s != null && context.mounted) {
-              var bool = await sendControllerWithLoadingInDialog(
-                  context, info, "$key!$s");
-              if (bool) {
-                final setter = _infoUpdaters[key];
-                setState(() {
-                  info = setter!(clickInfo, s);
-
-                });
-              }
-            }
-          },
-          child: Align(
-            alignment: Alignment.centerLeft, // 左对齐
-            child: Text(
-              "$title:$oldvalue",
-              textAlign: TextAlign.start,
-            ),
-          ),
-        );
-      }
-
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
           return Dialog(
@@ -83,25 +71,25 @@ void clickDeviceDialog(BuildContext context, Info info) {
                             fontSize: 26, fontWeight: FontWeight.bold),
                       ),
                     ),
-                    buildEditButton("设备名称", setState, "name", clickInfo.name),
-                    buildEditButton("设备编码", setState, "code", clickInfo.code),
-                    buildEditButton("网页地址", setState, "web", clickInfo.web),
-                    buildEditButton("视频地址", setState, "video", clickInfo.video),
-                    buildEditButton("目标服务器", setState, "ip", clickInfo.ip),
-                    buildEditButton("扫描枪接口", setState, "SM2D", clickInfo.SM2D),
+                    buildEditButton("设备名称", "name", setState),
+                    buildEditButton("设备编码", "code", setState),
+                    buildEditButton("网页地址", "web", setState),
+                    buildEditButton("视频地址", "video", setState),
+                    buildEditButton("目标服务器", "ip", setState),
+                    buildEditButton("扫描枪接口", "SM2D", setState),
                     Padding(
                       padding: const EdgeInsets.only(left: 13),
-                      child: Text("uuid:${clickInfo.uuid}"),
+                      child: Text("uuid:${info.uuid}"),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 13),
                       child: Row(
                         children: [
-                          Text("来源ip:${clickInfo.source.split(':')[0]}"),
+                          Text("来源ip:${info.source.split(':')[0]}"),
                           IconButton(
                               onPressed: () => {
                                     Clipboard.setData(ClipboardData(
-                                        text: clickInfo.source.split(':')[0]))
+                                        text: info.source.split(':')[0]))
                                   },
                               icon: const Icon(Icons.copy_all)),
                         ],
@@ -110,7 +98,7 @@ void clickDeviceDialog(BuildContext context, Info info) {
                     Padding(
                       padding: const EdgeInsets.only(left: 13),
                       child: Text(
-                          "外设信息:${clickInfo.devicesList.map((e) => e.productName).toString()}"),
+                          "外设信息:${info.devicesList.map((e) => e.productName).toString()}"),
                     ),
                     const SizedBox(
                       height: 10,
