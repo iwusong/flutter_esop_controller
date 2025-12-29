@@ -7,7 +7,6 @@ import 'package:esop/dto/Info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
-import '../AppProvider.dart';
 
 const salt = "dficn397dzlaaqwnzx884466288";
 
@@ -57,9 +56,7 @@ Future<bool> sendController(Info info, String cmd, {int timeout = 3}) async {
       Datagram? datagram = socket.receive();
       if (datagram != null) {
         String decode = utf8.decode(datagram.data);
-        // print(decode);
         if (decode == cmd) {
-          print("success");
           timer.cancel();
           socket.close();
           completer.complete(true);
@@ -102,18 +99,20 @@ int sendPing(RawDatagramSocket socket, String ip) {
   return send("ping", ip, 2369, socket);
 }
 
-void sendPingList(
-    RawDatagramSocket socket, List<String> ip, AppData app) async {
+void sendPingList(RawDatagramSocket socket, List<String> ip,
+    ValueChanged<String> addlogo) async {
   var dateTime = DateTime.now().millisecondsSinceEpoch;
   for (var o in ip) {
-    app.addlogo("scan  $o");
+
+    addlogo("scan  $o");
     for (int i = 1; i <= 255; i++) {
       var ip = "${o.split(".").sublist(0, 3).join(".")}.$i";
       sendPing(socket, ip);
     }
   }
   var i = DateTime.now().millisecondsSinceEpoch - dateTime;
-  app.addlogo("扫描耗时 $i 毫秒");
+  addlogo("扫描耗时 $i 毫秒");
+
 }
 
 int send(String msg, String add, int port, RawDatagramSocket socket) {
