@@ -1,19 +1,19 @@
 import 'dart:async';
 
+import 'package:esop/riverpod/app_data_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'AppProvider.dart';
 import 'components/clickDeviceDialog.dart';
 import 'components/consoleDialog.dart';
 import 'components/device_button_list.dart';
 import 'components/search_text_field.dart';
-import 'components/startUDPListener.dart';
+import 'utils/startUDPListener.dart';
 import 'config/config.dart';
 import 'dto/Info.dart';
 import 'main.dart';
 
-class HomeScreenState extends State<HomeScreen> {
+class HomeScreenState extends ConsumerState<HomeScreen> {
   final FocusNode _focusNode = FocusNode();
 
   final TextEditingController _controller =
@@ -27,9 +27,8 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadDataFuture = Provider.of<AppData>(context, listen: false)
-        .loadDataFromSharedPreferences();
-    startUDPListener(context, (Info newInfo) {
+    ref.read(appDataRiverpod.notifier).loadDataFromSharedPreferences();
+    startUDPListener(ref, (Info newInfo) {
       setInfoListUpdate(newInfo);
     });
   }
@@ -50,16 +49,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _loadDataFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else {
-          return buildContent(context);
-        }
-      },
-    );
+    return buildContent(context);
   }
 
   Widget buildContent(BuildContext context) {

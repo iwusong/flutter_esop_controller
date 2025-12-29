@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'AppProvider.dart';
 import 'HomeScreenState.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => AppData(),
-      child: const MyApp(),
+    // ChangeNotifierProvider(
+    //   create: (context) => AppData(),
+    //   child: const MyApp(),
+    // ),
+    const ProviderScope(
+      child: MyApp(),
     ),
   );
 }
@@ -25,10 +27,9 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget  {
   const HomeScreen({super.key});
 
   @override
   HomeScreenState createState() => HomeScreenState();
 }
-
