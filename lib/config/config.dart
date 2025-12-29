@@ -1,17 +1,18 @@
+import 'package:esop/riverpod/app_data_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
 
-import '../AppProvider.dart';
 import '../utils/util.dart';
 
-class ConfigSetting extends StatelessWidget {
+class ConfigSetting extends ConsumerWidget {
   const ConfigSetting({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    var appData = Provider.of<AppData>(context );
-    var list = appData.ipList.toList();
+  Widget build(BuildContext context, WidgetRef ref) {
+    var appData = ref.watch(appDataRiverpod);
+    var appDatafunc = ref.read(appDataRiverpod.notifier);
+    var list = appData.toList()..sort();
     var item = ListView.builder(
       itemCount: list.length,
       itemBuilder: (context, index) {
@@ -28,7 +29,7 @@ class ConfigSetting extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.delete),
                 onPressed: () {
-                  appData.removeOne(list[index]);
+                  appDatafunc.removeOne(list[index]);
                 },
               ),
             ],
@@ -50,14 +51,9 @@ class ConfigSetting extends StatelessWidget {
                   .then((response) {
                     response.body.split("\n").forEach((element) {
                       if (element.isNotEmpty) {
-                        var appData =
-                            Provider.of<AppData>(context, listen: false);
-                        if (!RegExp(
-                          r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
-                        ).hasMatch(input)) {
-                          if (!appData.ipList.contains(element)) {
-                            appData.add(element);
-                          }
+
+                        if (!appData.contains(element)) {
+                          appDatafunc.add(element);
                         }
                       }
                     });
@@ -94,7 +90,6 @@ class ConfigSetting extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () {
-                    var appData = Provider.of<AppData>(context, listen: false);
                     if (input.isNotEmpty) {
                       if (!RegExp(
                         r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
@@ -110,7 +105,7 @@ class ConfigSetting extends StatelessWidget {
                         );
                         return;
                       }
-                      if (appData.ipList.contains(
+                      if (appData.contains(
                           "${input.split(".").sublist(0, 3).join(".")}.*")) {
                         showDialog(
                           context: context,
@@ -123,7 +118,7 @@ class ConfigSetting extends StatelessWidget {
                         );
                         return;
                       }
-                      appData
+                      appDatafunc
                           .add("${input.split(".").sublist(0, 3).join(".")}.*");
                       input = "";
                       controller.clear();
